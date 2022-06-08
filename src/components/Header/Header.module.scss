@@ -1,0 +1,19 @@
+@use '../../scss/' as *;
+
+.wrapper {
+  width: 100%;
+  height: 56px;
+  display: flex;
+  justify-content: center;
+  background-color: $white-color;
+  box-shadow: 0px 1px 1px rgb(0 0 0 / 12%);
+}
+
+.inner {
+  max-width: 1318px;
+  height: 100%;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
