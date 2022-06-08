@@ -1,12 +1,7 @@
-
-import './App.css';
+import images from '~/assets/images';
 
 function App() {
-  return (
-    <div className="App">
-      App
-    </div>
-  );
+  return <h1>mytube-app</h1>;
 }
 
 export default App;

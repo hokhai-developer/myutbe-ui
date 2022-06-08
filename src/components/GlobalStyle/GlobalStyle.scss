@@ -1,0 +1,54 @@
+@import 'normalize.css';
+@import './custom.scss';
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@200;300;400;500;600;700&display=swap');
+
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-size: 1.6rem;
+  line-height: 1.5;
+  text-rendering: optimizeSpeed;
+  font-family: 'Nunito', sans-serif;
+  min-height: 200vh;
+  background-color: $background-color;
+  color: $text-color;
+  overflow-y: overlay;
+}
+
+html *::-webkit-scrollbar {
+  border-radius: 0;
+  width: 12px;
+}
+
+html *::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  border: 6px solid transparent;
+  background-color: $primary-color;
+}
+
+html *::-webkit-scrollbar-track {
+  border-radius: 0;
+  background-color: transparent;
+}
+
+button,
+input,
+[tabindex] {
+  outline: none;
+  border: none;
+}
+
+a {
+  color: var(--text-color);
+  text-decoration: none;
+}
