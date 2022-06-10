@@ -64,40 +64,22 @@
       height: 24px;
     }
   }
+}
+//search-result
+.search-result {
+  width: 588px;
+}
 
-  @include tablet {
-    .search-icon {
-      margin: auto 2px auto 10px;
-    }
+.search-popper {
+  border: 1px solid $primary-color;
+  border-top: 0;
+  border-radius: none;
+  padding: $padding 0;
 
-    .search-btn {
-      width: 40px;
-      background-color: $background-color;
-    }
-  }
-
-  @include mobile {
-    justify-content: flex-end;
-    border: none;
-
-    .input {
-      flex: 1;
-      font-size: 1.4rem;
-    }
-
-    .search-btn {
-      width: 28px;
-      height: 28px;
-      border: none;
-      background-color: transparent;
-    }
-
-    .search-icon {
-      display: none;
-    }
-    .clear-btn {
-      width: 28px;
-      height: 28px;
-    }
+  .search-head {
+    padding-left: 6px;
+    font-size: 1.2rem;
+    user-select: none;
+    font-weight: 300;
   }
 }

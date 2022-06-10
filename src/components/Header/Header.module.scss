@@ -92,14 +92,4 @@
   .search {
     flex: 1;
   }
-
-  @include tablet {
-    width: auto;
-    border: none;
-    flex: 1px;
-  }
-
-  @include mobile {
-    max-width: 261px;
-  }
 }
