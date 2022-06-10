@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import image from '~/assets/images';
@@ -31,9 +31,6 @@ const Header = (props) => {
         </div>
         <div className={cx('header-search')}>
           <Search className={cx('search')} />
-          <button className={cx('voice-btn')}>
-            <VoiceIcon />
-          </button>
         </div>
         <div className={cx('header-actions')}>
           <Actions />

@@ -34,6 +34,22 @@
     }
   }
 
+  .btn-login {
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    font-weight: 600;
+    height: 40px;
+    text-transform: uppercase;
+    gap: 0 $gap;
+    padding: 0 $gap;
+
+    &:hover {
+      background-color: $background-color;
+    }
+  }
+
   @include mobile {
     gap: 0 9px;
     margin-left: 8px;

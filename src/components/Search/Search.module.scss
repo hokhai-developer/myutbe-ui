@@ -5,13 +5,17 @@
   align-items: center;
   border: 1px solid $border-color;
 
-  //    border: 1px solid #1c62b9
   .search-icon {
-    margin: auto 6px auto 10px;
+    height: 100%;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
   }
 
   &:focus-within {
-    border: 1px solid #1c62b9;
+    border: 1px solid $primary-color;
   }
 
   .input {
@@ -24,6 +28,10 @@
     font-size: 1.6rem;
     line-height: 1.5;
     caret-color: $primary-color;
+
+    &:focus + .search-btn {
+      border-left-color: $primary-color;
+    }
   }
 
   .clear-btn {
@@ -42,6 +50,10 @@
     background-color: transparent;
     border-left: 1px solid $border-color;
     cursor: pointer;
+
+    &.hasValue-search {
+      background-color: $background-color;
+    }
 
     &:hover {
       background-color: $background-color;

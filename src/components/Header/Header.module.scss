@@ -93,25 +93,10 @@
     flex: 1;
   }
 
-  .voice-btn {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: $background-color;
-    border-radius: 50%;
-    cursor: pointer;
-  }
-
   @include tablet {
     width: auto;
     border: none;
     flex: 1px;
-
-    .voice-btn {
-      display: none;
-    }
   }
 
   @include mobile {

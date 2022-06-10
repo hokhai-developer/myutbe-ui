@@ -1,0 +1,27 @@
+@use '../../scss/' as *;
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 $padding;
+  gap: 0 $gap;
+  cursor: pointer;
+  border-radius: $border-radius;
+  border: 1px solid $primary-color;
+
+  .icon {
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    color: inherit;
+    pointer-events: none;
+  }
+  .title {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    color: inherit;
+    user-select: none;
+  }
+}

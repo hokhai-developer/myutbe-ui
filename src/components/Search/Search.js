@@ -37,7 +37,9 @@ const Search = ({ className }) => {
   return (
     <div className={cx('wrapper', className)}>
       {(inputFocus || searchValue.length > 0) && (
-        <SearchIcon className={cx('search-icon')} />
+        <button className={cx('search-icon')}>
+          <SearchIcon />
+        </button>
       )}
       {showInput && (
         <input
@@ -60,7 +62,10 @@ const Search = ({ className }) => {
         </button>
       )}
       <button
-        className={cx('search-btn')}
+        className={cx(
+          'search-btn',
+          `${searchValue.length > 0 ? 'hasValue-search' : ''}`,
+        )}
         onClick={handleClick}
         onMouseDown={(e) => e.preventDefault()}
       >
