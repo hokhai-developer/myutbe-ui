@@ -18,13 +18,9 @@ const Image = ({
   };
 
   return (
-    <img
-      src={src || fallback}
-      alt={alt}
-      className={cx('image', className)}
-      onError={handleError}
-      {...props}
-    />
+    <div className={cx('image', className)}>
+      <img src={src || fallback} alt={alt} onError={handleError} {...props} />
+    </div>
   );
 };
 
