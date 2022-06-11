@@ -1,0 +1,64 @@
+@use '../../scss/' as *;
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  background-color: $black-color;
+  opacity: 0.8;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+
+  .content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid $primary-color;
+    padding: $padding 0;
+    background-color: $white-color;
+  }
+  .content-top {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    margin-top: -$padding;
+    border-bottom-left-radius: $border-radius;
+    cursor: pointer;
+    &:hover {
+      background-color: $background-color;
+    }
+  }
+  .content-mid {
+    max-width: 400px;
+    max-height: 300px;
+    overflow: scroll;
+  }
+
+  .content-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+
+    .btn {
+      display: block;
+      padding: $padding $padding * 2;
+      border: 1px solid transparent;
+      border-radius: $border-radius;
+      cursor: pointer;
+    }
+    .btn-yes {
+      background-color: greenyellow;
+    }
+    .btn-cancel {
+      background-color: $primary-color;
+    }
+  }
+}

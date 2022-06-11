@@ -8,70 +8,81 @@ import { SearchIcon, ClearIcon } from '~/components/Icons';
 import styles from './Search.module.scss';
 import SearchHistory from './SearchHistory/SearchHistory';
 import Popper from '~/components/popper';
-import SearchResult from './SearchResult';
+import SearchServer from './SearchServer';
 import useDebounce from '~/components/hooks/useDebounce';
+import Modal from '../Modal/Modal';
 
 const cx = classNames.bind(styles);
 
 const Search = ({ className }) => {
-  const [searchValue, setSearchValue] = useState('');
-  const [showResult, setShowResult] = useState(false);
-  const [searchResultApi, setSearchResultApi] = useState([]);
-  const [searchResultLocal, setSearchResultLocal] = useState([]);
+  const [searchValue, setSearchValue] = useState(''); //oke
+  const [showResult, setShowResult] = useState(false); //oke
+  const [hasValue, setHasValue] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [searchResultLocalStorage, setSearchResultLocalStorage] = useState([]);
+  const [searchResultServer, setSearchResultServer] = useState([]);
 
+  const inputRef = useRef();
   const debounceSearchValue = useDebounce(searchValue.trim(), 800);
-
-  const searchValueGetLocal =
+  const dataGetLocal =
     JSON.parse(localStorage.getItem('searchValueLocal')) || [];
 
   useEffect(() => {
     if (!debounceSearchValue.trim().length) {
-      setShowResult([]);
       setSearchValue('');
       return;
     }
 
-    //xử lý tìm kiêm với local => từ tìm kiếm
-    if (searchValueGetLocal.length > 0) {
-      let searchValue = debounceSearchValue.trim().replaceAll(' ', '');
-      const newSearchResultLocal = searchValueGetLocal.filter((value) => {
-        return value.title.includes(searchValue, 0);
-      });
-      setSearchResultLocal(newSearchResultLocal);
-    }
-
-    //xử lý tìm kiêm với API sever => các loại phim
-    const fecthApi = async () => {};
-    fecthApi();
-
-    const setItemLocal = () => {
-      let isLike = false;
-      let searchValue = debounceSearchValue.trim().replaceAll(' ', '');
-      // không lưu nếu search value giống 100% giá trị trong local, tránh lãnh phí
-      if (searchValueGetLocal.length > 0) {
-        searchValueGetLocal.forEach((value) => {
-          if (value.title.includes(searchValue, 0)) {
-            isLike = true;
-            return;
-          }
+    //  get data from server
+    const FetchApi = () => {};
+    // get data from locolstorage
+    const getDataFromLocalStorage = () => {
+      const newSearchValue = debounceSearchValue
+        .toLowerCase()
+        .replaceAll(' ', '');
+      let valueTrue;
+      if (dataGetLocal.length > 0) {
+        valueTrue = dataGetLocal.filter((value) => {
+          return value.title?.includes(newSearchValue, 0);
         });
+      } else {
+        valueTrue = [];
       }
-      if (isLike) return;
-
-      searchValueGetLocal.push({
-        title: searchValue,
-        id: uuidv4(), //tạo giá trị để lưu. có thể thêm time để sau này clear
-      });
-
-      localStorage.setItem(
-        'searchValueLocal',
-        JSON.stringify(searchValueGetLocal),
-      );
+      //khong tim thay trong localstorage
+      if (valueTrue && valueTrue.length == 0) {
+        setHasValue(true);
+        localStorage.setItem(
+          'searchValueLocal',
+          JSON.stringify([
+            ...dataGetLocal,
+            {
+              title: newSearchValue,
+              id: uuidv4(),
+            },
+          ]),
+        );
+      } else {
+        setHasValue(false);
+        setSearchResultLocalStorage(valueTrue);
+        const isExact = valueTrue.find((value) => {
+          return newSearchValue.toString() === value.title.toString();
+        });
+        if (isExact === undefined) {
+          localStorage.setItem(
+            'searchValueLocal',
+            JSON.stringify([
+              ...dataGetLocal,
+              {
+                title: newSearchValue,
+                id: uuidv4(),
+              },
+            ]),
+          );
+        }
+      }
     };
-    setItemLocal();
+    getDataFromLocalStorage();
   }, [debounceSearchValue]);
-
-  const inputRef = useRef();
 
   const handleClick = (e) => {};
 
@@ -81,61 +92,92 @@ const Search = ({ className }) => {
   };
 
   return (
-    <HeadlessTippy
-      interactive
-      placement="bottom"
-      offset={[0, 0]}
-      visible={
-        showResult &&
-        (searchResultLocal.length > 0 || searchResultApi.length > 0)
-      }
-      onClickOutside={() => setShowResult(false)}
-      render={(attrs) => (
-        <div className={cx('search-result')} tabIndex="-1" {...attrs}>
-          <Popper className={cx('search-popper')}>
-            <p className={cx('search-head')}>Search Result</p>
-            <SearchResult />
-            {searchResultLocal && (
-              <p className={cx('search-head')}>Search History</p>
-            )}
-            {searchResultLocal &&
-              searchResultLocal.map((data) => {
-                return <SearchHistory key={data.id} data={data} />;
-              })}
-          </Popper>
+    <>
+      <HeadlessTippy
+        interactive
+        placement="bottom"
+        offset={[0, 0]}
+        visible={showResult && debounceSearchValue.length > 0}
+        onClickOutside={() => {
+          setShowResult(false);
+        }}
+        render={(attrs) => (
+          <div className={cx('search-result')} tabIndex="-1" {...attrs}>
+            <Popper className={cx('search-popper')}>
+              {hasValue ? (
+                <p className={cx('search-head')}>
+                  Không tìm thấy kết quả cho {debounceSearchValue.trim()}
+                </p>
+              ) : (
+                <>
+                  {searchResultServer.length > 0 && (
+                    <>
+                      <p className={cx('search-head')}>Search Result</p>
+                      <SearchServer />
+                    </>
+                  )}
+                  {searchResultLocalStorage.length > 0 && (
+                    <>
+                      <p className={cx('search-head')}>Search History</p>
+                      {searchResultLocalStorage.map((data) => {
+                        return (
+                          <SearchHistory
+                            data={data}
+                            key={data.id}
+                            setShowModal={setShowModal}
+                          />
+                        );
+                      })}
+                    </>
+                  )}
+                </>
+              )}
+            </Popper>
+          </div>
+        )}
+      >
+        <div className={cx('wrapper', className)}>
+          {showResult && (
+            <button className={cx('search-icon')}>
+              <SearchIcon />
+            </button>
+          )}
+
+          <input
+            ref={inputRef}
+            value={searchValue}
+            type="text"
+            className={cx('input')}
+            placeholder="Search"
+            onChange={(e) => setSearchValue(e.target.value)}
+            onFocus={() => {
+              setShowResult(true);
+            }}
+          />
+
+          {searchValue.length > 0 && (
+            <button className={cx('clear-btn')} onClick={handleClear}>
+              <ClearIcon />
+            </button>
+          )}
+          <button
+            className={cx('search-btn')}
+            onClick={handleClick}
+            onMouseDown={(e) => e.preventDefault()}
+          >
+            <SearchIcon className={cx('search-btn-icon')} />
+          </button>
         </div>
+      </HeadlessTippy>
+
+      {showModal && (
+        <Modal>
+          <p className={cx('modal-title')}>
+            Xóa {debounceSearchValue} khỏi lịch sử tìm kiếm của bạn ?
+          </p>
+        </Modal>
       )}
-    >
-      <div className={cx('wrapper', className)}>
-        {searchValue.length > 0 && (
-          <button className={cx('search-icon')}>
-            <SearchIcon />
-          </button>
-        )}
-
-        <input
-          ref={inputRef}
-          value={searchValue}
-          type="text"
-          className={cx('input')}
-          placeholder="Search"
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-
-        {searchValue.length > 0 && (
-          <button className={cx('clear-btn')} onClick={handleClear}>
-            <ClearIcon />
-          </button>
-        )}
-        <button
-          className={cx('search-btn')}
-          onClick={handleClick}
-          onMouseDown={(e) => e.preventDefault()}
-        >
-          <SearchIcon className={cx('search-btn-icon')} />
-        </button>
-      </div>
-    </HeadlessTippy>
+    </>
   );
 };
 

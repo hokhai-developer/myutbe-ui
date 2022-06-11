@@ -5,15 +5,24 @@ import styles from './SearchHistory.module.scss';
 import { SearchIcon, ClearIcon } from '~/components/Icons';
 
 const cx = classNames.bind(styles);
-const SearchHistory = ({ data }) => {
-  console.log(data.title);
+const SearchHistory = ({
+  data = {},
+  setShowModal = () => {
+    return;
+  },
+}) => {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('icon', 'search')}>
         <SearchIcon />
       </div>
       <p className={cx('title')}>{data.title}</p>
-      <div className={cx('icon', 'clear')}>
+      <div
+        className={cx('icon', 'clear')}
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
         <ClearIcon />
       </div>
     </div>
@@ -22,6 +31,7 @@ const SearchHistory = ({ data }) => {
 
 SearchHistory.propTypes = {
   data: PropTypes.object,
+  onDeletedHistory: PropTypes.func,
 };
 
 export default SearchHistory;

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
-import styles from './SearchResult.module.scss';
+import styles from './SearchServer.module.scss';
 import { SearchIcon } from '~/components/Icons';
 
 const cx = classNames.bind(styles);
