@@ -18,7 +18,7 @@ const cx = classNames.bind(styles);
 const Search = ({ className }) => {
   const [searchValue, setSearchValue] = useState('');
   const [showResult, setShowResult] = useState(false);
-  const [noResult, setNoResult] = useState(false);
+  const [hasResult, setHasResult] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [idItemDeleteFromLocalStorage, setIdItemDeleteFromLocalStorage] =
     useState('');
@@ -39,61 +39,56 @@ const Search = ({ className }) => {
     //call API server
     const fetchApi = async () => {
       const result = await searchMovie(debounceSearchValue);
-      if (result && result.results) {
+      if (result && result.results.length > 0) {
         setSearchResultServer(result.results);
-        setNoResult(true);
+        setHasResult(true);
+        handleDebounceSEarchValueWithDataHistory();
       }
     };
     fetchApi();
 
-    // get data from locolstorage
-    const getDataFromLocalStorage = () => {
-      const newSearchValue = debounceSearchValue
-        .toLowerCase()
-        .replaceAll(' ', '');
-      let valueTrue;
-      if (dataHistory.length > 0) {
-        valueTrue = dataHistory.filter((value) => {
+    function handleDebounceSEarchValueWithDataHistory() {
+      const createItemSaveDataHistory = {
+        title: debounceSearchValue,
+        id: uuidv4(),
+      };
+      const setAndSaveDebounceSearchValue = () => {
+        localStorage.setItem(
+          'searchValueLocal',
+          JSON.stringify([...dataHistory, createItemSaveDataHistory]),
+        );
+        setDataHistory((pre) => [...pre, createItemSaveDataHistory]);
+      };
+      if (dataHistory.length === 0) {
+        setAndSaveDebounceSearchValue();
+      } else {
+        let newSearchValue = debounceSearchValue
+          .toLowerCase()
+          .replaceAll(' ', '');
+        const valueTrue = dataHistory.filter((value) => {
           return value.title
             .toLowerCase()
             .replaceAll(' ', '')
             .includes(newSearchValue, 0);
         });
-      } else {
-        valueTrue = [];
-      }
-      //khong tim thay trong dataHistory
-      if (valueTrue.length === 0) {
-        setNoResult(false);
-        const itemHistory = { title: debounceSearchValue.trim(), id: uuidv4() };
-        localStorage.setItem(
-          'searchValueLocal',
-          JSON.stringify([...dataHistory, itemHistory]),
-        );
-        setDataHistory((pre) => [...pre, itemHistory]);
-      } else {
-        setNoResult(true);
-        setSearchResultLocalStorage(valueTrue);
-        const isExact = valueTrue.find((value) => {
-          return (
-            newSearchValue.toString().trim() ===
-            value.title.toString().trim().toLowerCase().replaceAll(' ', '')
-          );
-        });
-        if (isExact === undefined) {
-          const itemHistory = {
-            title: debounceSearchValue.trim(),
-            id: uuidv4(),
-          };
-          localStorage.setItem(
-            'searchValueLocal',
-            JSON.stringify([...dataHistory, itemHistory]),
-          );
-          setDataHistory((pre) => [...pre, itemHistory]);
+        if (valueTrue.length === 0) {
+          setAndSaveDebounceSearchValue();
+        } else {
+          setSearchResultLocalStorage(() => [...valueTrue]);
+          const exactlyTheSame = valueTrue.findIndex((value) => {
+            return (
+              debounceSearchValue.toLowerCase().replaceAll(' ', '') ===
+              value.title.toString().trim().toLowerCase().replaceAll(' ', '')
+            );
+          });
+          if (exactlyTheSame !== -1) {
+            return;
+          } else {
+            setAndSaveDebounceSearchValue();
+          }
         }
       }
-    };
-    getDataFromLocalStorage();
+    }
   }, [debounceSearchValue]);
 
   const handleClick = (e) => {};
@@ -120,7 +115,7 @@ const Search = ({ className }) => {
           searchResultLocalStorage.length === 0 &&
           searchResultServer.length === 0
         ) {
-          setNoResult(false);
+          setHasResult(false);
         }
       }
       const indexItemDataHistory = dataHistory.findIndex((item) => {
@@ -151,7 +146,7 @@ const Search = ({ className }) => {
         render={(attrs) => (
           <div className={cx('search-result')} tabIndex="-1" {...attrs}>
             <Popper className={cx('search-result-popper')}>
-              {!noResult ? (
+              {!hasResult ? (
                 <p className={cx('search-result-novalue')}>
                   Không tìm thấy kết quả cho "{debounceSearchValue.trim()}"
                 </p>

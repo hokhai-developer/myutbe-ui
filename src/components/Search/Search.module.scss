@@ -107,6 +107,7 @@
   .search-body {
     overflow-y: scroll;
     flex: 1;
+    min-height: 40px;
     margin-top: 18px;
   }
 }
