@@ -1,0 +1,40 @@
+@use '../../../scss/' as *;
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  margin-right: 14px;
+  cursor: pointer;
+  &:hover {
+    background-color: $background-color;
+  }
+}
+
+.item-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.item-title {
+  flex: 1;
+
+  display: -webkit-box;
+  max-width: 300px;
+  padding: 0 $padding;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.item-btn {
+  cursor: pointer;
+  background-color: transparent;
+  &:hover {
+    background-color: transparent;
+  }
+}

@@ -8,23 +8,59 @@ import {
   NotificationsIcon,
   SettingsIcon,
   UserIcon,
+  LanguageIcon,
+  ThemIcon,
+  Feedback,
+  NextIcon,
 } from '../Icons';
 import Image from '../Image/Image';
-import useWindowSize from '~/components/hooks/useWindowResize';
 import Button from '../Button';
+import Menu from '../Menu';
 
 const cx = classNames.bind(styles);
+const MENU_ITEMS_NOt_USER = [
+  {
+    iconLeft: <LanguageIcon />,
+    iconRight: <NextIcon />,
+    title: 'Language',
+    children: {
+      title: 'Language',
+      data: [
+        {
+          type: 'language',
+          code: 'en',
+          title: 'English',
+        },
+        {
+          type: 'language',
+          code: 'vi',
+          title: 'Tiếng Việt',
+        },
+      ],
+    },
+  },
+  {
+    iconLeft: <ThemIcon />,
+    iconRight: <NextIcon />,
+    title: 'Appearance Theme',
+    children: {
+      title: 'Device Them',
+      data: [
+        { type: 'theme', code: '1', title: 'Dark Theme' },
+        { type: 'theme', code: '2', title: 'White Theme' },
+      ],
+    },
+  },
+  {
+    iconLeft: <Feedback />,
+    title: 'Send Feedback',
+    to: '/feedback',
+  },
+];
 
 const Actions = (props) => {
   const [hasUser, setHasUser] = useState(false);
-  const [showActions, setShowActions] = useState(true);
-  const windowWidth = useWindowSize();
-
-  useEffect(() => {
-    if (windowWidth < 391) {
-      setShowActions(false);
-    }
-  }, [windowWidth]);
+  const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className={cx('wrapper')}>
@@ -50,9 +86,20 @@ const Actions = (props) => {
         </>
       ) : (
         <>
-          <button className={cx('action-btn', 'settings-btn')}>
-            <SettingsIcon className={cx('icon')} />
-          </button>
+          <Menu
+            data={MENU_ITEMS_NOt_USER}
+            setShowMenu={setShowMenu}
+            showMenu={showMenu}
+          >
+            <button
+              className={cx('action-btn', 'settings-btn', { active: showMenu })}
+              onClick={() => {
+                setShowMenu(!showMenu);
+              }}
+            >
+              <SettingsIcon className={cx('icon')} />
+            </button>
+          </Menu>
           <Button
             className={cx('btn-login')}
             leftIcon={<UserIcon />}

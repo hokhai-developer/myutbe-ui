@@ -3,6 +3,11 @@
 .wrapper {
   display: flex;
   align-items: center;
+  gap: 0 $gap;
+
+  .active {
+    color: $primary-color;
+  }
 
   .action-btn {
     width: 40px;
@@ -15,6 +20,9 @@
 
     &:focus {
       color: $primary-color;
+    }
+    &:hover {
+      background-color: $background-color;
     }
   }
 

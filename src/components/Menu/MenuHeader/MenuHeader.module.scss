@@ -1,0 +1,41 @@
+@use '../../../scss/' as *;
+.wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.menu-header-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+
+  cursor: pointer;
+  &:hover {
+    background-color: $background-color;
+  }
+}
+
+.menu-header-title {
+  flex: 1;
+  padding: 0 $padding;
+  font-size: 1.8rem;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+.bottom-hr {
+  width: 100%;
+  height: 1px;
+  border: none;
+  background-color: $primary-color;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import HeadlessTippy from '@tippyjs/react/headless';
@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { SearchIcon, ClearIcon } from '~/components/Icons';
 import styles from './Search.module.scss';
 import SearchHistory from './SearchHistory/SearchHistory';
-import Popper from '~/components/popper';
+import Popper from '~/components/Popper';
 import SearchServer from './SearchServer';
 import useDebounce from '~/components/hooks/useDebounce';
 import Modal from '../Modal/Modal';
@@ -31,7 +31,7 @@ const Search = ({ className }) => {
   const inputRef = useRef();
   const debounceSearchValue = useDebounce(searchValue.trim(), 800);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!debounceSearchValue.trim().length) {
       setSearchValue('');
       return;
@@ -90,8 +90,6 @@ const Search = ({ className }) => {
       }
     }
   }, [debounceSearchValue]);
-
-  const handleClick = (e) => {};
 
   const handleClear = () => {
     setSearchValue('');
@@ -221,7 +219,6 @@ const Search = ({ className }) => {
           )}
           <button
             className={cx('search-btn')}
-            onClick={handleClick}
             onMouseDown={(e) => e.preventDefault()}
           >
             <SearchIcon className={cx('search-btn-icon')} />

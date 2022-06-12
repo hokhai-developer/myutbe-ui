@@ -176,3 +176,89 @@ export const UserIcon = ({ width = '24px', height = '24px', className }) => (
     </g>
   </svg>
 );
+
+export const ThemIcon = ({ width = '24px', height = '24px', className }) => (
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    className={className}
+    width={width}
+    height={height}
+  >
+    <g className="style-scope yt-icon">
+      <path
+        d="M12 22C10.93 22 9.86998 21.83 8.83998 21.48L7.41998 21.01L8.83998 20.54C12.53 19.31 15 15.88 15 12C15 8.12 12.53 4.69 8.83998 3.47L7.41998 2.99L8.83998 2.52C9.86998 2.17 10.93 2 12 2C17.51 2 22 6.49 22 12C22 17.51 17.51 22 12 22ZM10.58 20.89C11.05 20.96 11.53 21 12 21C16.96 21 21 16.96 21 12C21 7.04 16.96 3 12 3C11.53 3 11.05 3.04 10.58 3.11C13.88 4.81 16 8.21 16 12C16 15.79 13.88 19.19 10.58 20.89Z"
+        className="style-scope yt-icon"
+      ></path>
+    </g>
+  </svg>
+);
+
+export const LanguageIcon = ({
+  width = '24px',
+  height = '24px',
+  className,
+}) => (
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    className={className}
+    width={width}
+    height={height}
+  >
+    <g className="style-scope yt-icon">
+      <path
+        d="M12.26,16.18l-2.93-2.87c-0.8,0.86-1.64,1.71-2.48,2.54L4.6,18.1L3.9,17.4l2.25-2.25c0.84-0.84,1.68-1.69,2.48-2.55 c-1.18-1.23-2.17-2.64-2.9-4.18L5.73,8.4h1.14c0.65,1.26,1.47,2.43,2.44,3.45c1.59-1.81,2.89-3.69,3.43-5.7H2.08v-1h6.65V3h1v2.15 h6.78v1h-2.73c-0.54,2.32-2.01,4.42-3.77,6.42l2.63,2.58C12.51,15.5,12.39,15.82,12.26,16.18z M21.51,21.01h-0.95l-1.12-3.04h-4.91 l-1.11,3.04h-0.96l4.09-10.81h0.87L21.51,21.01z M19.15,17.2l-2.17-5.89l-2.17,5.89H19.15z"
+        className="style-scope yt-icon"
+      ></path>
+    </g>
+  </svg>
+);
+export const Feedback = ({ width = '24px', height = '24px', className }) => (
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    className={className}
+    width={width}
+    height={height}
+  >
+    <g className="style-scope yt-icon">
+      <path
+        d="M13,14h-2v-2h2V14z M13,5h-2v6h2V5z M19,3H5v16.59l3.29-3.29L8.59,16H9h10V3 M20,2v15H9l-5,5V2H20L20,2z"
+        className="style-scope yt-icon"
+      ></path>
+    </g>
+  </svg>
+);
+
+export const NextIcon = ({ width = '24px', height = '24px', className }) => (
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    className={className}
+    width={width}
+    height={height}
+  >
+    <g>
+      <path d="M9.4,18.4l-0.7-0.7l5.6-5.6L8.6,6.4l0.7-0.7l6.4,6.4L9.4,18.4z"></path>
+    </g>
+  </svg>
+);
+export const BackIcon = ({ width = '24px', height = '24px', className }) => (
+  <svg
+    viewBox="0 0 24 24"
+    preserveAspectRatio="xMidYMid meet"
+    fill="currentColor"
+    className={className}
+    width={width}
+    height={height}
+  >
+    <g>
+      <path d="M21,11v1H5.64l6.72,6.72l-0.71,0.71L3.72,11.5l7.92-7.92l0.71,0.71L5.64,11H21z"></path>
+    </g>
+  </svg>
+);
