@@ -11,73 +11,85 @@ import Popper from '~/components/popper';
 import SearchServer from './SearchServer';
 import useDebounce from '~/components/hooks/useDebounce';
 import Modal from '../Modal/Modal';
+import { searchMovie } from '~/services';
 
 const cx = classNames.bind(styles);
 
 const Search = ({ className }) => {
-  const [searchValue, setSearchValue] = useState(''); //oke
-  const [showResult, setShowResult] = useState(false); //oke
-  const [hasValue, setHasValue] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [showResult, setShowResult] = useState(false);
+  const [noResult, setNoResult] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [idItemDeleteFromLocalStorage, setIdItemDeleteFromLocalStorage] =
+    useState('');
+  const [dataHistory, setDataHistory] = useState(() => {
+    return JSON.parse(localStorage.getItem('searchValueLocal')) || [];
+  });
   const [searchResultLocalStorage, setSearchResultLocalStorage] = useState([]);
   const [searchResultServer, setSearchResultServer] = useState([]);
 
   const inputRef = useRef();
   const debounceSearchValue = useDebounce(searchValue.trim(), 800);
-  const dataGetLocal =
-    JSON.parse(localStorage.getItem('searchValueLocal')) || [];
 
   useEffect(() => {
     if (!debounceSearchValue.trim().length) {
       setSearchValue('');
       return;
     }
+    //call API server
+    const fetchApi = async () => {
+      const result = await searchMovie(debounceSearchValue);
+      if (result && result.results) {
+        setSearchResultServer(result.results);
+        setNoResult(true);
+      }
+    };
+    fetchApi();
 
-    //  get data from server
-    const FetchApi = () => {};
     // get data from locolstorage
     const getDataFromLocalStorage = () => {
       const newSearchValue = debounceSearchValue
         .toLowerCase()
         .replaceAll(' ', '');
       let valueTrue;
-      if (dataGetLocal.length > 0) {
-        valueTrue = dataGetLocal.filter((value) => {
-          return value.title?.includes(newSearchValue, 0);
+      if (dataHistory.length > 0) {
+        valueTrue = dataHistory.filter((value) => {
+          return value.title
+            .toLowerCase()
+            .replaceAll(' ', '')
+            .includes(newSearchValue, 0);
         });
       } else {
         valueTrue = [];
       }
-      //khong tim thay trong localstorage
-      if (valueTrue && valueTrue.length == 0) {
-        setHasValue(true);
+      //khong tim thay trong dataHistory
+      if (valueTrue.length === 0) {
+        setNoResult(false);
+        const itemHistory = { title: debounceSearchValue.trim(), id: uuidv4() };
         localStorage.setItem(
           'searchValueLocal',
-          JSON.stringify([
-            ...dataGetLocal,
-            {
-              title: newSearchValue,
-              id: uuidv4(),
-            },
-          ]),
+          JSON.stringify([...dataHistory, itemHistory]),
         );
+        setDataHistory((pre) => [...pre, itemHistory]);
       } else {
-        setHasValue(false);
+        setNoResult(true);
         setSearchResultLocalStorage(valueTrue);
         const isExact = valueTrue.find((value) => {
-          return newSearchValue.toString() === value.title.toString();
+          return (
+            newSearchValue.toString().trim() ===
+            value.title.toString().trim().toLowerCase().replaceAll(' ', '')
+          );
         });
         if (isExact === undefined) {
+          const itemHistory = {
+            title: debounceSearchValue.trim(),
+            id: uuidv4(),
+          };
           localStorage.setItem(
             'searchValueLocal',
-            JSON.stringify([
-              ...dataGetLocal,
-              {
-                title: newSearchValue,
-                id: uuidv4(),
-              },
-            ]),
+            JSON.stringify([...dataHistory, itemHistory]),
           );
+          setDataHistory((pre) => [...pre, itemHistory]);
         }
       }
     };
@@ -91,6 +103,38 @@ const Search = ({ className }) => {
     inputRef.current.focus();
   };
 
+  const handleDeleteItemFromLocalStorage = (boolean) => {
+    if (!boolean) {
+      setIdItemDeleteFromLocalStorage('');
+      return;
+    } else {
+      const indexItemSearchResult = searchResultLocalStorage.findIndex(
+        (item) => {
+          return item.id === idItemDeleteFromLocalStorage;
+        },
+      );
+      if (indexItemSearchResult !== -1) {
+        searchResultLocalStorage.splice(indexItemSearchResult, 1);
+        setSearchResultLocalStorage((pre) => [...pre]);
+        if (
+          searchResultLocalStorage.length === 0 &&
+          searchResultServer.length === 0
+        ) {
+          setNoResult(false);
+        }
+      }
+      const indexItemDataHistory = dataHistory.findIndex((item) => {
+        return item.id === idItemDeleteFromLocalStorage;
+      });
+      if (indexItemDataHistory !== -1) {
+        dataHistory.splice(indexItemDataHistory, 1);
+        setDataHistory((pre) => [...pre]);
+        localStorage.setItem('searchValueLocal', JSON.stringify(dataHistory));
+      }
+      setIdItemDeleteFromLocalStorage('');
+    }
+  };
+
   return (
     <>
       <HeadlessTippy
@@ -100,35 +144,50 @@ const Search = ({ className }) => {
         visible={showResult && debounceSearchValue.length > 0}
         onClickOutside={() => {
           setShowResult(false);
+          if (showModal) {
+            setShowResult(true);
+          }
         }}
         render={(attrs) => (
           <div className={cx('search-result')} tabIndex="-1" {...attrs}>
-            <Popper className={cx('search-popper')}>
-              {hasValue ? (
-                <p className={cx('search-head')}>
-                  Không tìm thấy kết quả cho {debounceSearchValue.trim()}
+            <Popper className={cx('search-result-popper')}>
+              {!noResult ? (
+                <p className={cx('search-result-novalue')}>
+                  Không tìm thấy kết quả cho "{debounceSearchValue.trim()}"
                 </p>
               ) : (
                 <>
                   {searchResultServer.length > 0 && (
-                    <>
-                      <p className={cx('search-head')}>Search Result</p>
-                      <SearchServer />
-                    </>
+                    <div className={cx('search-popper-list')}>
+                      <p className={cx('search-fixed')}>Search Server</p>
+                      <div className={cx('search-body')}>
+                        {searchResultServer &&
+                          searchResultServer.map((result, index) => {
+                            return (
+                              <SearchServer key={result.id} data={result} />
+                            );
+                          })}
+                      </div>
+                    </div>
                   )}
                   {searchResultLocalStorage.length > 0 && (
-                    <>
-                      <p className={cx('search-head')}>Search History</p>
-                      {searchResultLocalStorage.map((data) => {
-                        return (
-                          <SearchHistory
-                            data={data}
-                            key={data.id}
-                            setShowModal={setShowModal}
-                          />
-                        );
-                      })}
-                    </>
+                    <div className={cx('search-popper-list')}>
+                      <p className={cx('search-fixed')}>Search History</p>
+                      <div className={cx('search-body')}>
+                        {searchResultLocalStorage.map((data) => {
+                          return (
+                            <SearchHistory
+                              data={data}
+                              key={data.id}
+                              setShowModal={setShowModal}
+                              setIdItemDeleteFromLocalStorage={
+                                setIdItemDeleteFromLocalStorage
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
                   )}
                 </>
               )}
@@ -137,7 +196,7 @@ const Search = ({ className }) => {
         )}
       >
         <div className={cx('wrapper', className)}>
-          {showResult && (
+          {(showResult || searchValue.trim().length > 0) && (
             <button className={cx('search-icon')}>
               <SearchIcon />
             </button>
@@ -152,6 +211,11 @@ const Search = ({ className }) => {
             onChange={(e) => setSearchValue(e.target.value)}
             onFocus={() => {
               setShowResult(true);
+            }}
+            onBlur={() => {
+              if (searchValue.trim().length === 0) {
+                setShowResult(false);
+              }
             }}
           />
 
@@ -171,7 +235,10 @@ const Search = ({ className }) => {
       </HeadlessTippy>
 
       {showModal && (
-        <Modal>
+        <Modal
+          setShowModal={setShowModal}
+          handleDeleteItemFromLocalStorage={handleDeleteItemFromLocalStorage}
+        >
           <p className={cx('modal-title')}>
             Xóa {debounceSearchValue} khỏi lịch sử tìm kiếm của bạn ?
           </p>

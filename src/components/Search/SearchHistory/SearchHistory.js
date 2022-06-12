@@ -10,9 +10,11 @@ const SearchHistory = ({
   setShowModal = () => {
     return;
   },
+  className = '',
+  ...passProps
 }) => {
   return (
-    <div className={cx('wrapper')}>
+    <div className={cx('wrapper', className)}>
       <div className={cx('icon', 'search')}>
         <SearchIcon />
       </div>
@@ -20,6 +22,7 @@ const SearchHistory = ({
       <div
         className={cx('icon', 'clear')}
         onClick={() => {
+          passProps.setIdItemDeleteFromLocalStorage(data.id);
           setShowModal(true);
         }}
       >
@@ -32,6 +35,7 @@ const SearchHistory = ({
 SearchHistory.propTypes = {
   data: PropTypes.object,
   onDeletedHistory: PropTypes.func,
+  classNames: PropTypes.string,
 };
 
 export default SearchHistory;
