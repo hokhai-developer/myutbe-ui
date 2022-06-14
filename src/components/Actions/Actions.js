@@ -114,7 +114,7 @@ const MENU_FOR_CREATE = [
 ];
 
 const Actions = (props) => {
-  const [hasUser, setHasUser] = useState(true);
+  const [hasUser, setHasUser] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);

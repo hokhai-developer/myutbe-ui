@@ -1,13 +1,10 @@
-import Explore from '~/pages/Explore';
 import Home from '~/pages/Home';
-import Shorts from '~/pages/Shorts';
-import Subscriptions from '~/pages/Subscriptions';
+import Login from '~/pages/Login';
+import { LoginLayout } from '~/layouts';
 
 export const publicRoutes = [
-  { path: '/', page: <Home /> },
-  { path: '/explore', page: <Explore /> },
-  { path: '/shorts', page: <Shorts /> },
-  { path: '/subscriptions', page: <Subscriptions /> },
+  { path: '/', component: Home },
+  { path: '/login', component: Login, layout: LoginLayout },
 ];
 
 export const privateRoutes = [];

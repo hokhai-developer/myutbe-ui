@@ -1,0 +1,8 @@
+@use '../../scss/' as *;
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $background-color;
+  min-height: 100vh;
+}
