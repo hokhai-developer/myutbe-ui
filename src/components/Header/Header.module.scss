@@ -23,17 +23,6 @@
   display: flex;
   align-items: center;
   gap: 0 $gap;
-
-  @include tablet {
-    gap: 0 4px;
-    margin-right: 8px;
-    .btn-toggle {
-      display: none;
-    }
-  }
-  @include mobile {
-    // flex: 1px;
-  }
 }
 
 .btn-toggle {
@@ -58,29 +47,8 @@
   border-radius: 6px;
   flex-shrink: 0;
   height: 34px;
-  width: 34px;
+  width: 150px;
   object-fit: contain;
-
-  @include mobile {
-    width: 26px;
-    height: 26px;
-  }
-}
-
-.logo-title {
-  color: $black-color;
-  font-size: 1.8rem;
-  font-weight: 700;
-
-  @include tablet {
-    font-size: 1.6rem;
-    max-width: 130px;
-    text-align: center;
-  }
-
-  @include mobile {
-    display: none;
-  }
 }
 
 .header-search {

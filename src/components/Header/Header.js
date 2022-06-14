@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import image from '~/assets/images';
+import images from '~/assets/images';
 import { ToggleIcon, VoiceIcon } from '~/components/Icons';
 import Image from '~/components/Image';
 import Actions from '../Actions';
@@ -22,12 +22,14 @@ const Header = (props) => {
           </button>
           <Link to="/" className={cx('link-logo')}>
             <Image
-              src={image.logo}
+              src={
+                'https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg'
+              }
+              fallback={images.logo}
               alt="Logo-F8"
               className={cx('logo-image')}
             />
           </Link>
-          <h4 className={cx('logo-title')}>Học Lập Trình Để Đi Làm</h4>
         </div>
         <div className={cx('header-search')}>
           <Search className={cx('search')} />
