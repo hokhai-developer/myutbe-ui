@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import Tippy from '@tippyjs/react/headless';
@@ -10,35 +10,73 @@ import MenuHeader from './MenuHeader';
 const cx = classNames.bind(styles);
 
 const Menu = ({ children, data = [], onClick = () => {}, ...passProps }) => {
-  const hasHeader = true;
+  const [menuHistory, setMenuHistory] = useState([{ data: data }]);
+  const currentMenu = menuHistory[menuHistory.length - 1];
+
+  const handleClickItemHasChildren = (children) => {
+    if (!!children) {
+      const newMenu = children;
+      setMenuHistory((pre) => [...pre, newMenu]);
+    } else {
+      console.log('no Children');
+    }
+  };
+
+  const onBackMenu = () => {
+    menuHistory.pop();
+    setMenuHistory((pre) => [...pre]);
+  };
 
   const renderResult = (attrs) => {
     return (
       <div className={cx('menu-list')} tabIndex="-1" {...attrs}>
         <Popper className={cx('menu-popper')}>
-          {hasHeader && (
+          {menuHistory.length > 1 && (
             <div className={cx('menu-header')}>
-              <MenuHeader />
+              <MenuHeader
+                title={currentMenu.title}
+                onBack={() => onBackMenu()}
+              />
             </div>
           )}
-          <div className={cx('menu-body', { hasHeader: hasHeader })}>
-            <MenuItem className={cx('menu-item')} item={data[0]} />
+          <div
+            className={cx('menu-body', { hasHeader: menuHistory.length > 1 })}
+          >
+            {currentMenu.data.map((item) => {
+              return (
+                <MenuItem
+                  key={item.id}
+                  className={cx('menu-item')}
+                  item={item}
+                  onClick={() => {
+                    if (item.children) {
+                      handleClickItemHasChildren(item.children);
+                    } else {
+                      console.log('item khong co children menu');
+                    }
+                  }}
+                />
+              );
+            })}
           </div>
         </Popper>
       </div>
     );
   };
+
   return (
     <div>
       <Tippy
-        visible={passProps.showMenu}
         interactive
+        visible={passProps.showMenu}
         delay={[0, 700]}
+        offset={passProps.offset ? passProps.offset : [0]}
         onClickOutside={() => passProps.setShowMenu(false)}
-        // hideOnClick={}
         placement="bottom-end"
         render={renderResult}
-        // onHide={}
+        onHide={() => {
+          setMenuHistory((prev) => [prev[0]]);
+        }}
       >
         {children}
       </Tippy>

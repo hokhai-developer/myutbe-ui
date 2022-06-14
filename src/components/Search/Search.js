@@ -9,7 +9,7 @@ import styles from './Search.module.scss';
 import SearchHistory from './SearchHistory/SearchHistory';
 import Popper from '~/components/Popper';
 import SearchServer from './SearchServer';
-import useDebounce from '~/components/hooks/useDebounce';
+import { useDebounce } from '~/components/hooks/hooks';
 import Modal from '../Modal/Modal';
 import { searchMovie } from '~/services';
 

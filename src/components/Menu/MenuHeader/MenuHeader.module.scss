@@ -4,6 +4,7 @@
   align-items: center;
   width: 100%;
   justify-content: space-between;
+  border: 1px solid $primary-color;
 }
 
 .menu-header-btn {
@@ -17,6 +18,7 @@
   cursor: pointer;
   &:hover {
     background-color: $background-color;
+    border-right: 1px solid $primary-color;
   }
 }
 
@@ -31,11 +33,4 @@
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
-}
-
-.bottom-hr {
-  width: 100%;
-  height: 1px;
-  border: none;
-  background-color: $primary-color;
 }

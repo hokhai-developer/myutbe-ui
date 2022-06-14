@@ -20,10 +20,9 @@
 
 .item-title {
   flex: 1;
-
   display: -webkit-box;
   max-width: 300px;
-  padding: 0 $padding;
+  padding: 0 $padding * 2;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -35,6 +34,6 @@
   cursor: pointer;
   background-color: transparent;
   &:hover {
-    background-color: transparent;
+    background-color: $background-color;
   }
 }

@@ -5,23 +5,21 @@ import styles from './MenuHeader.module.scss';
 import { BackIcon } from '~/components/Icons';
 
 const cx = classNames.bind(styles);
-const MenuHeader = ({ className, title }) => {
+const MenuHeader = ({ className, title = '', onBack = () => {} }) => {
   return (
-    <>
-      <div className={cx('wrapper', className)}>
-        <button className={cx('menu-header-btn')}>
-          <BackIcon />
-        </button>
-        <h4 className={cx('menu-header-title')}>{title || 'Menu Header'}</h4>
+    <div className={cx('wrapper', className)}>
+      <div className={cx('menu-header-btn')} onClick={onBack}>
+        <BackIcon />
       </div>
-      <hr className={cx('bottom-hr')} />
-    </>
+      <h4 className={cx('menu-header-title')}>{title || 'Menu Header'}</h4>
+    </div>
   );
 };
 
 MenuHeader.propTypes = {
   className: PropTypes.string,
   title: PropTypes.string,
+  onBack: PropTypes.func,
 };
 
 export default MenuHeader;
