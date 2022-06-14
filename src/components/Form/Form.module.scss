@@ -120,12 +120,13 @@
   border-top: 0;
   border-right: 0;
   border-top-right-radius: $border-radius;
-  background-color: $background-color;
+  background-color: transparent;
   position: absolute;
   top: 0;
   right: 0;
 
   &:hover {
     background-color: $second-color;
+    cursor: pointer;
   }
 }
