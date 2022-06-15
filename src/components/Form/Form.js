@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import { ClearIcon } from '~/components/Icons';
 import styles from './Form.module.scss';
 import { useNavigate } from 'react-router-dom';
+import { auth } from 'firebase/Config';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 
 const cx = classNames.bind(styles);
 
@@ -13,18 +18,40 @@ const Form = ({ ...passProps }) => {
   const [valueFullname, setValueFullname] = useState('');
   const [valuePassWordConformmation, setValuePassWordConformmation] =
     useState('');
-  const [errorMessage, setErrorMessage] = useState({
-    email: null,
-    password: null,
-    fullname: null,
-    passWordConformmation: null,
-  });
+  const [errorMessage, setErrorMessage] = useState();
   const [formValue, setFormValue] = useState({
     email: null,
     password: null,
     fullname: null,
-    passWordConformmation: null,
+    passwordConformmation: null,
   });
+
+  useEffect(() => {
+    if (passProps.currentForm === 1) {
+      setErrorMessage({
+        email: null,
+        password: null,
+        fullname: null,
+        passwordConformmation: null,
+      });
+      setFormValue({
+        email: null,
+        password: null,
+        fullname: null,
+        passwordConformmation: null,
+      });
+    } else if (passProps.currentForm === 0) {
+      setErrorMessage({
+        email: null,
+        password: null,
+        signInfail: null,
+      });
+      setFormValue({
+        email: null,
+        password: null,
+      });
+    }
+  }, [passProps.currentForm]);
 
   const navigate = useNavigate();
 
@@ -32,7 +59,7 @@ const Form = ({ ...passProps }) => {
     const target = e.target;
     const value = target.value.trim();
 
-    //check noEmpty, trường nào muốn bắt buộc thì thêm vào đây
+    //check noEmpty, trường nào muốn bắt buộc thì thêm vào
     if (
       value.length === 0 &&
       (target.type === 'email' ||
@@ -48,7 +75,7 @@ const Form = ({ ...passProps }) => {
     }
 
     //check email : isEmail
-    if (target.type === 'email' && value.length > 0) {
+    if (target.type === 'email') {
       const validateEmail = (email) => {
         return String(email)
           .toLowerCase()
@@ -75,7 +102,7 @@ const Form = ({ ...passProps }) => {
     }
 
     //check password : password.length > 6
-    if (target.type === 'password' && value.length > 0) {
+    if (target.type === 'password' && target.name === 'password') {
       if (value.length > 6) {
         const newData = { ...formValue, password: value };
         const newErrorMessage = { ...errorMessage, password: null };
@@ -90,67 +117,124 @@ const Form = ({ ...passProps }) => {
         setErrorMessage(newErrorMessage);
         setFormValue(newData);
       }
-
       return;
     }
 
     //check password-Conformmation
-    if (
-      target.type === 'password' &&
-      target.name === 'password_Conformmation'
-    ) {
+    if (target.type === 'password' && target.name === 'passwordConformmation') {
       if (value !== valuePassword) {
         const newErrorMessage = {
           ...errorMessage,
-          passWordConformmation: 'Mật khẩu nhập lại không đúng',
+          passwordConformmation: 'Mật khẩu nhập lại không đúng',
         };
-        const newData = { ...formValue, passWordConformmation: null };
+        const newData = { ...formValue, passwordConformmation: null };
         setErrorMessage(newErrorMessage);
         setFormValue(newData);
-        return;
       } else {
-        const newData = { ...formValue, passWordConformmation: value };
+        const newData = { ...formValue, passwordConformmation: value };
         const newErrorMessage = {
           ...errorMessage,
-          passWordConformmation: null,
+          passwordConformmation: null,
         };
         setErrorMessage(newErrorMessage);
         setFormValue(newData);
       }
+      return;
+    }
+    //check fullname
+    if (target.type === 'text' && target.name === 'fullname') {
+      if (value.length > 18) {
+        const newErrorMessage = {
+          ...errorMessage,
+          fullname: 'Tên không được dài hơn 18 ký tự',
+        };
+        const newData = { ...formValue, fullname: null };
+        setErrorMessage(newErrorMessage);
+        setFormValue(newData);
+      } else {
+        const newData = { ...formValue, fullname: value };
+        const newErrorMessage = {
+          ...errorMessage,
+          fullname: null,
+        };
+        setErrorMessage(newErrorMessage);
+        setFormValue(newData);
+      }
+      return;
     }
   };
 
   // khi focus thì lọa bỏ error chó chính nó
   const handleFocus = (e) => {
     const target = e.target;
-    if (target.type && target.name) {
-      const newErrorMessage = { ...errorMessage, [target.name]: null };
-      setErrorMessage(newErrorMessage);
-    }
+    const newErrorMessage = {
+      ...errorMessage,
+      [target.name]: null,
+      signInfail: null,
+    };
+    setErrorMessage(newErrorMessage);
   };
 
   //khi submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formValueIsFalse = Object.values(formValue).some((value) => {
       return value === null;
     });
     if (!formValueIsFalse) {
-      alert('co thể submit form với formValue');
-      return;
-    }
-    const keyISNull = Object.keys(formValue).filter((key) => {
-      return formValue[key] === null;
-    });
-    let newErrorMessage = { ...errorMessage };
-    if (keyISNull.length > 0) {
-      keyISNull.forEach((key) => {
-        if (errorMessage[key] === null) {
-          newErrorMessage[key] = 'Trường này không được đẻ trống';
+      if (passProps.currentForm === 1) {
+        try {
+          const create = await createUserWithEmailAndPassword(
+            auth,
+            formValue.email,
+            formValue.password,
+          );
+          navigate(-1);
+        } catch (error) {
+          setValueEmail('');
+          setErrorMessage({
+            ...errorMessage,
+            email: 'Email đã được đăng kí vui lòng chọn email khác',
+          });
+          setFormValue({ ...formValue, email: null });
         }
+        return;
+      } else if (passProps.currentForm === 0) {
+        try {
+          const signIn = await signInWithEmailAndPassword(
+            auth,
+            formValue.email,
+            formValue.password,
+          );
+          navigate('/');
+        } catch (error) {
+          // alert(error);
+          setErrorMessage({
+            signInfail: 'Mật khẩu hoặc email không đúng',
+            email: null,
+            password: null,
+          });
+        }
+      }
+    } else {
+      const keyISNull = Object.keys(formValue).filter((key) => {
+        return formValue[key] === null;
       });
-      setErrorMessage(newErrorMessage);
-      return;
+      let newErrorMessage = { ...errorMessage };
+      if (keyISNull.length > 0) {
+        keyISNull.forEach((key) => {
+          console.log(keyISNull);
+          if (errorMessage[key] === null) {
+            newErrorMessage[key] = 'Trường này không được đẻ trống';
+            if (valuePassWordConformmation.length > 0) {
+              newErrorMessage.passwordConformmation =
+                'Mật khẩu nhập lại không đúng';
+            }
+          }
+        });
+        setErrorMessage(newErrorMessage);
+        return;
+      }
     }
   };
 
@@ -197,7 +281,7 @@ const Form = ({ ...passProps }) => {
         )}
         <div
           className={cx('form-group', {
-            invalid: !!errorMessage.email,
+            invalid: !!errorMessage?.email,
           })}
         >
           <label htmlFor="email" className={cx('form-label')}>
@@ -221,12 +305,12 @@ const Form = ({ ...passProps }) => {
             className={cx('form-control')}
           />
 
-          <span className={cx('form-message')}>{errorMessage.email}</span>
+          <span className={cx('form-message')}>{errorMessage?.email}</span>
         </div>
 
         <div
           className={cx('form-group', {
-            invalid: !!errorMessage.password,
+            invalid: !!errorMessage?.password,
           })}
         >
           <label htmlFor="password_Conformmation" className={cx('form-label')}>
@@ -249,13 +333,13 @@ const Form = ({ ...passProps }) => {
             type="password"
             className={cx('form-control')}
           />
-          <span className={cx('form-message')}>{errorMessage.password}</span>
+          <span className={cx('form-message')}>{errorMessage?.password}</span>
         </div>
 
         {passProps.currentForm === 1 && (
           <div
             className={cx('form-group', {
-              invalid: !!errorMessage.passWordConformmation,
+              invalid: !!errorMessage.passwordConformmation,
             })}
           >
             <label
@@ -282,11 +366,17 @@ const Form = ({ ...passProps }) => {
               className={cx('form-control')}
             />
             <span className={cx('form-message')}>
-              {errorMessage.passWordConformmation}
+              {errorMessage.passwordConformmation}
             </span>
           </div>
         )}
-
+        <div
+          className={cx('form-group', {
+            invalid: !!errorMessage?.signInfail,
+          })}
+        >
+          <span className={cx('form-message')}>{errorMessage?.signInfail}</span>
+        </div>
         <button className={cx('form-submit')} onClick={handleSubmit}>
           {!passProps.currentForm ? 'Đăng Nhập' : 'Đăng ký thành viên'}
         </button>

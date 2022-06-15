@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
 import styles from './Actions.module.scss';
@@ -23,6 +23,7 @@ import Button from '../Button';
 import Menu from '../Menu';
 import { v4 as uuidv4 } from 'uuid';
 import Notification from '../Notification/Notification';
+import { AuthContext } from '~/context/AuthProvider';
 
 const cx = classNames.bind(styles);
 const MENU_NOT_USER = [
@@ -40,12 +41,18 @@ const MENU_NOT_USER = [
           code: 'en',
           title: 'English',
           id: uuidv4(),
+          choose: true,
+          to: null,
+          action: null,
         },
         {
           type: 'language',
           code: 'vi',
           title: 'Tiếng Việt',
           id: uuidv4(),
+          choose: true,
+          to: null,
+          action: null,
         },
       ],
     },
@@ -64,12 +71,18 @@ const MENU_NOT_USER = [
           code: '1',
           title: 'Dark Theme',
           id: uuidv4(),
+          choose: true,
+          to: null,
+          action: null,
         },
         {
           type: 'theme',
           code: '2',
           title: 'White Theme',
           id: uuidv4(),
+          choose: true,
+          to: null,
+          action: null,
         },
       ],
     },
@@ -77,8 +90,10 @@ const MENU_NOT_USER = [
   {
     iconLeft: <Feedback />,
     title: 'Send Feedback',
-    to: '/feedback',
     id: uuidv4(),
+    to: '/feedback',
+    choose: null,
+    action: null,
   },
 ];
 
@@ -86,14 +101,19 @@ const MENU_HAS_USER = [
   {
     iconLeft: <ProfileIcon />,
     title: 'Your Channel',
-    to: '/profile',
     id: uuidv4(),
+    to: '/profile',
+    choose: null,
+    action: null,
   },
   ...MENU_NOT_USER,
   {
     iconLeft: <LogOutIcon />,
     title: 'Log Out',
     id: uuidv4(),
+    action: 'logout',
+    choose: null,
+    to: null,
   },
 ];
 
@@ -101,27 +121,32 @@ const MENU_FOR_CREATE = [
   {
     iconLeft: <UpVideoIcon />,
     title: 'Movies',
-    to: '/movies',
     id: uuidv4(),
+    to: '/movies',
+    choose: null,
+    action: null,
   },
 
   {
     iconLeft: <LiveIcon />,
     title: 'TV Series',
-    to: '/live',
     id: uuidv4(),
+    to: '/live',
+    choose: null,
+    action: null,
   },
 ];
 
 const Actions = (props) => {
-  const [hasUser, setHasUser] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
+  const user = useContext(AuthContext);
 
+  console.log(user);
   return (
     <div className={cx('wrapper')}>
-      {hasUser ? (
+      {Object.values(user.user).length !== 0 ? (
         <>
           <Menu
             data={MENU_FOR_CREATE}
@@ -157,6 +182,7 @@ const Actions = (props) => {
 
           <div className={cx('action-user')}>
             <Menu
+              setUser={user.setUser}
               data={MENU_HAS_USER}
               setShowMenu={setShowMenu}
               showMenu={showMenu}
@@ -169,15 +195,15 @@ const Actions = (props) => {
                 }}
               >
                 <Image
-                  src="https://picsum.photos/200/300"
-                  alt="user-avatar"
+                  src={user.user.photoURL}
+                  alt={user.user.displayName}
                   className={cx('avatar')}
                 />
               </button>
             </Menu>
 
             <a href="" className={cx('user-name')}>
-              User NameUser
+              {user.user.displayName}
             </a>
           </div>
         </>

@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import Tippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
-import Tippy from '@tippyjs/react/headless';
-import styles from './Menu.module.scss';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Popper from '~/components/Popper';
-import MenuItem from './MenuItem';
+import styles from './Menu.module.scss';
 import MenuHeader from './MenuHeader';
+import MenuItem from './MenuItem';
+import { signOut } from 'firebase/auth';
+import { auth } from '~/firebase/Config';
 
 const cx = classNames.bind(styles);
 
 const Menu = ({ children, data = [], onClick = () => {}, ...passProps }) => {
   const [menuHistory, setMenuHistory] = useState([{ data: data }]);
   const currentMenu = menuHistory[menuHistory.length - 1];
+  const navigate = useNavigate();
 
-  const handleClickItemHasChildren = (children) => {
-    if (!!children) {
-      const newMenu = children;
+  const handleClickItem = (item) => {
+    if (!!item.children) {
+      const newMenu = item.children;
       setMenuHistory((pre) => [...pre, newMenu]);
     } else {
-      console.log('no Children');
+      if (!!item.to) {
+        navigate(item.to);
+      } else if (!!item.choose) {
+        console.log('choose');
+      } else if (!!item.action) {
+        if (item.action === 'logout') {
+          handleLogOutUser();
+        }
+      }
     }
+  };
+  const handleLogOutUser = async () => {
+    const isLogOut = await signOut(auth);
+    passProps.setUser({});
+    passProps.setShowMenu(false);
   };
 
   const onBackMenu = () => {
@@ -49,11 +66,7 @@ const Menu = ({ children, data = [], onClick = () => {}, ...passProps }) => {
                   className={cx('menu-item')}
                   item={item}
                   onClick={() => {
-                    if (item.children) {
-                      handleClickItemHasChildren(item.children);
-                    } else {
-                      console.log('item khong co children menu');
-                    }
+                    handleClickItem(item);
                   }}
                 />
               );

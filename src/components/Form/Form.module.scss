@@ -72,12 +72,12 @@
   outline: none;
   background-color: $primary-color;
   margin-top: 12px;
-  padding: 12px 16px;
+  padding: $padding 0;
   font-weight: 600;
   color: $white-color;
   border: none;
   width: 100%;
-  font-size: 14px;
+  font-size: 1.6rem;
   border-radius: $border-radius;
   cursor: pointer;
 }
