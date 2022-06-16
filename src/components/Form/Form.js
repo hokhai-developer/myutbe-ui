@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
 import { ClearIcon } from '~/components/Icons';
@@ -8,7 +8,9 @@ import { auth } from 'firebase/Config';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth';
+import { AuthContext } from '~/context/AuthProvider';
 
 const cx = classNames.bind(styles);
 
@@ -25,6 +27,8 @@ const Form = ({ ...passProps }) => {
     fullname: null,
     passwordConformmation: null,
   });
+  const navigate = useNavigate();
+  const user = useContext(AuthContext);
 
   useEffect(() => {
     if (passProps.currentForm === 1) {
@@ -52,8 +56,6 @@ const Form = ({ ...passProps }) => {
       });
     }
   }, [passProps.currentForm]);
-
-  const navigate = useNavigate();
 
   const handleBlur = (e) => {
     const target = e.target;
@@ -189,7 +191,23 @@ const Form = ({ ...passProps }) => {
             formValue.email,
             formValue.password,
           );
-          navigate(-1);
+          if (create.user && auth.currentUser) {
+            updateProfile(auth.currentUser, {
+              displayName: formValue.fullname,
+              photoURL: 'http://placehold.jp/3d4070/ffffff/150x150.png',
+            })
+              .then(() => {
+                user.setUser({
+                  displayName: formValue.fullname,
+                  photoURL: 'http://placehold.jp/3d4070/ffffff/150x150.png',
+                });
+                navigate(-1);
+              })
+              .catch((error) => {
+                alert(error);
+                navigate(-1);
+              });
+          }
         } catch (error) {
           setValueEmail('');
           setErrorMessage({

@@ -1,10 +1,8 @@
 import classNames from 'classnames/bind';
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import images from '~/assets/images';
-import { ToggleIcon, VoiceIcon } from '~/components/Icons';
+import { ToggleIcon } from '~/components/Icons';
 import Image from '~/components/Image';
 import Actions from '../Actions';
 import Search from '../Search';

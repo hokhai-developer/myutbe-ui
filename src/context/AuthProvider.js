@@ -9,27 +9,34 @@ export const AuthContext = React.createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const isLogIn = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { displayName, photoURL, email, uid } = user;
-        setUser({
-          displayName: displayName === null ? 'User-Name' : displayName,
-          photoURL: photoURL === null ? 'https://picsum.photos/200' : photoURL,
-          email,
-          uid,
-        });
-      }
 
+  const customUser = (data) => {
+    if (user && !user.displayName && !user.photoURL) {
+      setUser({
+        ...user,
+        displayName: data.displayName,
+        photoURL: data.photoURL,
+      });
+    }
+  };
+  useEffect(() => {
+    const islognIn = onAuthStateChanged(auth, (userFirebase) => {
+      if (userFirebase && auth.currentUser) {
+        const currentUser = auth.currentUser;
+        const { email, uid, displayName, photoURL } = currentUser;
+
+        setUser({ email, uid, displayName, photoURL });
+      }
       setIsLoading(false);
     });
+
     return () => {
-      isLogIn();
+      islognIn();
     };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: user, setUser: setUser }}>
+    <AuthContext.Provider value={{ user: user, setUser: customUser }}>
       {isLoading ? <Loading /> : children}
     </AuthContext.Provider>
   );
