@@ -1,6 +1,5 @@
 import classNames from 'classnames/bind';
 import { useState } from 'react';
-import { ClearIcon } from '~/components/Icons';
 import styles from './Form.module.scss';
 import {
   isEmail,
@@ -9,6 +8,11 @@ import {
   checkPassword,
   maxLength,
 } from './formValidate';
+import { auth } from '~/firebase/config';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import userSlice from '~/redux/userSlice';
 
 const cx = classNames.bind(styles);
 const RegisterForm = (props) => {
@@ -29,6 +33,8 @@ const RegisterForm = (props) => {
     fullName: '',
     passwordConfirmation: '',
   });
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleFocus = (e) => {
     const target = e.target;
@@ -126,14 +132,53 @@ const RegisterForm = (props) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const valueNotValid = Object.keys(formValue).filter((key) => {
       return formValue[key] !== null && formValue[key].length === 0; //khong bat buoc thi valu la null
     });
     if (valueNotValid.length === 0) {
-      //submit form
-      alert('submitform');
+      try {
+        const createUser = await createUserWithEmailAndPassword(
+          auth,
+          formValue.email,
+          formValue.password,
+        );
+        if (createUser && createUser.user) {
+          await updateProfile(auth.currentUser, {
+            photoURL:
+              'http://placehold.jp/3d4070/ffffff/150x150.png?text=default',
+            displayName: formValue.fullName,
+          })
+            .then(() => {
+              const displayName = formValue.fullName;
+              const photoURL =
+                'http://placehold.jp/3d4070/ffffff/150x150.png?text=default';
+              const email = createUser.user.email;
+              const uid = createUser.user.uid;
+              dispatch(
+                userSlice.actions.setUser({
+                  photoURL,
+                  email,
+                  uid,
+                  displayName,
+                }),
+              );
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          navigate(-1);
+        }
+      } catch (error) {
+        if (error && error.message) {
+          setErrorMessage({
+            ...errorMessage,
+            email: 'Tài khoản đã được sử dụng',
+          });
+          setFormValue({ ...formValue, email: '' });
+        }
+      }
       return;
     }
 
@@ -242,11 +287,9 @@ const RegisterForm = (props) => {
             className={cx('form-control')}
           />
           <span className={cx('form-message')}>
-            {' '}
             {errorMessage.passwordConfirmation}
           </span>
         </div>
-        <span className={cx('server-message')}></span>
         <button className={cx('form-submit')} onClick={(e) => handleSubmit(e)}>
           Đăng ký thành viên
         </button>

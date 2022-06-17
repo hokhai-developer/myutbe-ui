@@ -8,7 +8,9 @@ import styles from './Menu.module.scss';
 import MenuHeader from './MenuHeader';
 import MenuItem from './MenuItem';
 import { signOut } from 'firebase/auth';
-import { auth } from '~/firebase/Config';
+import { auth } from '~/firebase/config';
+import { useDispatch } from 'react-redux';
+import userSlice from '~/redux/userSlice';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +18,7 @@ const Menu = ({ children, data = [], onClick = () => {}, ...passProps }) => {
   const [menuHistory, setMenuHistory] = useState([{ data: data }]);
   const currentMenu = menuHistory[menuHistory.length - 1];
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleClickItem = (item) => {
     if (!!item.children) {
@@ -33,9 +36,15 @@ const Menu = ({ children, data = [], onClick = () => {}, ...passProps }) => {
       }
     }
   };
-  const handleLogOutUser = async () => {
-    const isLogOut = await signOut(auth);
-    passProps.setUser({});
+  const handleLogOutUser = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(userSlice.actions.logoutUser());
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
     passProps.setShowMenu(false);
   };
 

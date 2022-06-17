@@ -1,0 +1,40 @@
+@use '../../../scss' as *;
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0 $gap;
+
+  .settings-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:focus {
+      color: $primary-color;
+    }
+    &:hover {
+      background-color: $background-color;
+    }
+  }
+
+  .btn-login {
+    border: 1px solid $primary-color;
+    color: $primary-color;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    font-weight: 600;
+    height: 40px;
+    text-transform: uppercase;
+    gap: 0 $gap;
+    padding: 0 $gap;
+
+    &:hover {
+      background-color: $background-color;
+    }
+  }
+}

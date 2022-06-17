@@ -1,10 +1,17 @@
 import classNames from 'classnames/bind';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useState } from 'react';
 import styles from './Form.module.scss';
 import { isEmail, isRequired, minLength } from './formValidate';
+import { auth } from '~/firebase/config';
+import { useDispatch, useSelector } from 'react-redux';
+import userSlice from '~/redux/userSlice';
+import { userSelector } from '~/redux/selectors';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 const SignInForm = (props) => {
+  const [errorMessageFromServer, setErrorMessageFromServer] = useState('');
   const [emailValue, setEmailValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
   const [errorMessage, setErrorMessage] = useState({
@@ -16,9 +23,14 @@ const SignInForm = (props) => {
     password: '',
   });
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const currentUser = useSelector(userSelector);
+
   const handleFocus = (e) => {
     const target = e.target;
     const name = target.name;
+    setErrorMessageFromServer('');
     setErrorMessage({ ...errorMessage, [name]: '' });
   };
 
@@ -68,14 +80,31 @@ const SignInForm = (props) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const valueNotValid = Object.keys(formValue).filter((key) => {
       return formValue[key] !== null && formValue[key].length === 0; //khong bat buoc thi valu la null
     });
     if (valueNotValid.length === 0) {
-      //submit form
-      alert('submitform');
+      try {
+        const loggedInSuccessfully = await signInWithEmailAndPassword(
+          auth,
+          formValue.email,
+          formValue.password,
+        );
+        if (loggedInSuccessfully.user) {
+          const { displayName, email, photoURL, uid } =
+            loggedInSuccessfully.user;
+          dispatch(
+            userSlice.actions.setUser({ displayName, email, photoURL, uid }),
+          );
+        }
+        navigate(-1);
+      } catch (error) {
+        if (error.message) {
+          setErrorMessageFromServer('Tài khoản hoặc mật khẩu không đúng');
+        }
+      }
       return;
     }
 
@@ -144,7 +173,13 @@ const SignInForm = (props) => {
           />
           <span className={cx('form-message')}>{errorMessage.password}</span>
         </div>
-        <span className={cx('server-message')}></span>
+        <span
+          className={cx('sever-message', {
+            displayNone: errorMessageFromServer.length === 0,
+          })}
+        >
+          {errorMessageFromServer}
+        </span>
         <button className={cx('form-submit')} onClick={(e) => handleSubmit(e)}>
           Đăng Nhập
         </button>

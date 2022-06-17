@@ -1,0 +1,18 @@
+@use '../../../scss/' as *;
+
+.create-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  cursor: pointer;
+
+  &:focus {
+    color: $primary-color;
+  }
+  &:hover {
+    background-color: $background-color;
+  }
+}

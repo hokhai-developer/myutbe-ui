@@ -95,7 +95,7 @@
 
   .form-group {
     display: flex;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     flex-direction: column;
   }
 
@@ -160,4 +160,15 @@
   .spacer {
     margin-top: 36px;
   }
+}
+.sever-message {
+  margin-top: 16px;
+  margin-bottom: -10px;
+  font-size: 1.4rem;
+  line-height: 1.6rem;
+  padding: 4px 0 0;
+  color: $second-color;
+}
+.displayNone {
+  display: none;
 }
