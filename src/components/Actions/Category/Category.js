@@ -2,31 +2,13 @@ import Tippy from '@tippyjs/react';
 import classNames from 'classnames/bind';
 import { useState } from 'react';
 import 'tippy.js/dist/tippy.css';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateIcon, LiveIcon, UpVideoIcon } from '~/components/Icons';
+
+import { MENU_CATEGORY } from '~/components/Actions/defaultMenu';
+import { CreateIcon } from '~/components/Icons';
 import Menu from '~/components/Menu';
 import styles from './Category.module.scss';
 
 const cx = classNames.bind(styles);
-const MENU_CATEGORY = [
-  {
-    iconLeft: <UpVideoIcon />,
-    title: 'Movies',
-    id: uuidv4(),
-    to: '/movies',
-    choose: null,
-    action: null,
-  },
-
-  {
-    iconLeft: <LiveIcon />,
-    title: 'TV Series',
-    id: uuidv4(),
-    to: '/live',
-    choose: null,
-    action: null,
-  },
-];
 
 const Category = (props) => {
   const [showCategory, setShowCategory] = useState(false);

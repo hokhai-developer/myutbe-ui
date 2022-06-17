@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
 import Tippy from '@tippyjs/react';
-import 'tippy.js/dist/tippy.css';
-import classNames from 'classnames/bind';
-import styles from './Notification.module.scss';
-import PropTypes from 'prop-types';
-import { NotificationsIcon } from '~/components/Icons';
 import HeadlessTippy from '@tippyjs/react/headless';
+import classNames from 'classnames/bind';
+import { useState } from 'react';
+import 'tippy.js/dist/tippy.css';
+
+import { NotificationsIcon } from '~/components/Icons';
 import Popper from '~/components/Popper';
+import styles from './Notification.module.scss';
 import NotificationItem from './NotificationItem';
 
 const cx = classNames.bind(styles);
-const Notification = ({ children, className, ...passProps }) => {
+const Notification = () => {
   const [showNotification, setShowNotification] = useState(false);
   return (
     <div>

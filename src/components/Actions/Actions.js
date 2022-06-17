@@ -1,12 +1,13 @@
 import classNames from 'classnames/bind';
-import { useState, useEffect } from 'react';
-import styles from './Actions.module.scss';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { userSelector } from '~/redux/selectors';
+import styles from './Actions.module.scss';
+
 import Category from './Category';
 import Notification from './Notification';
-import User from './User';
 import Setting from './Setting/Setting';
+import User from './User';
 
 const cx = classNames.bind(styles);
 
