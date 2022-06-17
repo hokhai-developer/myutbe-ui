@@ -1,4 +1,4 @@
-export const addTodo = () => {
+export const getUser = () => {
   return {
     type: 'User/get',
   };
