@@ -1,29 +1,27 @@
-import React, { useContext, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
-import classNames from 'classnames/bind';
-import styles from './Actions.module.scss';
 import Tippy from '@tippyjs/react';
+import classNames from 'classnames/bind';
+import { useState } from 'react';
 import 'tippy.js/dist/tippy.css';
+import { v4 as uuidv4 } from 'uuid';
+import Button from '../Button';
 import {
   CreateIcon,
-  NotificationsIcon,
-  SettingsIcon,
-  UserIcon,
-  LanguageIcon,
-  ThemIcon,
   Feedback,
-  NextIcon,
-  ProfileIcon,
-  LogOutIcon,
-  UpVideoIcon,
+  LanguageIcon,
   LiveIcon,
+  LogOutIcon,
+  NextIcon,
+  NotificationsIcon,
+  ProfileIcon,
+  SettingsIcon,
+  ThemIcon,
+  UpVideoIcon,
+  UserIcon,
 } from '../Icons';
 import Image from '../Image/Image';
-import Button from '../Button';
 import Menu from '../Menu';
-import { v4 as uuidv4 } from 'uuid';
 import Notification from '../Notification/Notification';
-import { AuthContext } from '~/context/AuthProvider';
+import styles from './Actions.module.scss';
 
 const cx = classNames.bind(styles);
 const MENU_NOT_USER = [
@@ -117,7 +115,7 @@ const MENU_HAS_USER = [
   },
 ];
 
-const MENU_FOR_CREATE = [
+const MENU_CATEGORY = [
   {
     iconLeft: <UpVideoIcon />,
     title: 'Movies',
@@ -138,26 +136,26 @@ const MENU_FOR_CREATE = [
 ];
 
 const Actions = (props) => {
+  const [hasUser, setHasUser] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [showCreateMenu, setShowCreateMenu] = useState(false);
-  const user = useContext(AuthContext);
+  const [showCategory, setShowCategory] = useState(false);
+  // const user = useContext(AuthContext);
 
-  console.log(user);
   return (
     <div className={cx('wrapper')}>
-      {Object.values(user.user).length !== 0 ? (
+      {hasUser && (
         <>
           <Menu
-            data={MENU_FOR_CREATE}
-            showMenu={showCreateMenu}
-            setShowMenu={setShowCreateMenu}
+            data={MENU_CATEGORY}
+            showMenu={showCategory}
+            setShowMenu={setShowCategory}
             offset={[-10, 10]}
           >
-            <Tippy delay={[0, 50]} content="Create" placement="bottom">
+            <Tippy delay={[0, 50]} content="Category" placement="bottom">
               <button
                 className={cx('action-btn', 'create-btn')}
-                onClick={() => setShowCreateMenu(!showCreateMenu)}
+                onClick={() => setShowCategory(!showCategory)}
               >
                 <CreateIcon className={cx('icon')} />
               </button>
@@ -179,53 +177,38 @@ const Actions = (props) => {
               </button>
             </Tippy>
           </Notification>
-
-          <div className={cx('action-user')}>
-            <Menu
-              setUser={user.setUser}
-              data={MENU_HAS_USER}
-              setShowMenu={setShowMenu}
-              showMenu={showMenu}
-              offset={[-10, 10]}
-            >
-              <button
-                className={cx('user-btn')}
-                onClick={() => {
-                  setShowMenu(!showMenu);
-                }}
-              >
-                <Image
-                  src={user.user.photoURL}
-                  alt={user.user.displayName}
-                  className={cx('avatar')}
-                />
-              </button>
-            </Menu>
-
-            <a href="" className={cx('user-name')}>
-              {user.user.displayName}
-            </a>
-          </div>
         </>
-      ) : (
-        <>
-          <Menu
-            data={MENU_NOT_USER}
-            setShowMenu={setShowMenu}
-            showMenu={showMenu}
-          >
-            <button
-              className={cx('action-btn', 'settings-btn', {
-                active: showMenu,
-              })}
-              onClick={() => {
-                setShowMenu(!showMenu);
-              }}
-            >
-              <SettingsIcon className={cx('icon')} />
-            </button>
-          </Menu>
+      )}
 
+      <div className={cx('action-user')}>
+        <Menu
+          data={hasUser ? MENU_HAS_USER : MENU_NOT_USER}
+          setShowMenu={setShowMenu}
+          showMenu={showMenu}
+          offset={hasUser ? [-10, 10] : [0]}
+        >
+          <button
+            className={cx({
+              'user-btn': hasUser,
+              'action-btn': !hasUser,
+              'settings-btn': !hasUser,
+            })}
+            onClick={() => {
+              setShowMenu(!showMenu);
+            }}
+          >
+            {hasUser ? (
+              <Image src={''} alt="Themovies" className={cx('avatar')} />
+            ) : (
+              <SettingsIcon className={cx('icon')} />
+            )}
+          </button>
+        </Menu>
+        {hasUser ? (
+          <a href="" className={cx('user-name')}>
+            display name
+          </a>
+        ) : (
           <Button
             className={cx('btn-login')}
             leftIcon={<UserIcon />}
@@ -233,12 +216,11 @@ const Actions = (props) => {
           >
             Sign In
           </Button>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };
-
 Actions.propTypes = {};
 
 export default Actions;

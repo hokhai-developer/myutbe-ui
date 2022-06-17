@@ -1,24 +1,23 @@
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import HeadlessTippy from '@tippyjs/react/headless';
 import classNames from 'classnames/bind';
 import PropTypes from 'prop-types';
-import HeadlessTippy from '@tippyjs/react/headless';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { SearchIcon, ClearIcon } from '~/components/Icons';
+import { useDebounce } from '~/components/hooks/hooks';
+import { ClearIcon, SearchIcon } from '~/components/Icons';
+import Popper from '~/components/Popper';
+import { searchMovie } from '~/services';
+import Modal from '../Modal/Modal';
 import styles from './Search.module.scss';
 import SearchHistory from './SearchHistory/SearchHistory';
-import Popper from '~/components/Popper';
 import SearchServer from './SearchServer';
-import { useDebounce } from '~/components/hooks/hooks';
-import Modal from '../Modal/Modal';
-import { searchMovie } from '~/services';
 
 const cx = classNames.bind(styles);
 
 const Search = ({ className }) => {
   const [searchValue, setSearchValue] = useState('');
   const [showResult, setShowResult] = useState(false);
-  const [hasResult, setHasResult] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [idItemDeleteFromLocalStorage, setIdItemDeleteFromLocalStorage] =
     useState('');
@@ -41,7 +40,6 @@ const Search = ({ className }) => {
       const result = await searchMovie(debounceSearchValue);
       if (result && result.results.length > 0) {
         setSearchResultServer(result.results);
-        setHasResult(true);
         handleDebounceSEarchValueWithDataHistory();
       }
     };
@@ -52,7 +50,7 @@ const Search = ({ className }) => {
         title: debounceSearchValue,
         id: uuidv4(),
       };
-      const setAndSaveDebounceSearchValue = () => {
+      const saveLocalStorage = () => {
         localStorage.setItem(
           'searchValueLocal',
           JSON.stringify([...dataHistory, createItemSaveDataHistory]),
@@ -60,7 +58,7 @@ const Search = ({ className }) => {
         setDataHistory((pre) => [...pre, createItemSaveDataHistory]);
       };
       if (dataHistory.length === 0) {
-        setAndSaveDebounceSearchValue();
+        saveLocalStorage();
       } else {
         let newSearchValue = debounceSearchValue
           .toLowerCase()
@@ -72,7 +70,7 @@ const Search = ({ className }) => {
             .includes(newSearchValue, 0);
         });
         if (valueTrue.length === 0) {
-          setAndSaveDebounceSearchValue();
+          saveLocalStorage();
         } else {
           setSearchResultLocalStorage(() => [...valueTrue]);
           const exactlyTheSame = valueTrue.findIndex((value) => {
@@ -84,7 +82,7 @@ const Search = ({ className }) => {
           if (exactlyTheSame !== -1) {
             return;
           } else {
-            setAndSaveDebounceSearchValue();
+            saveLocalStorage();
           }
         }
       }
@@ -109,12 +107,6 @@ const Search = ({ className }) => {
       if (indexItemSearchResult !== -1) {
         searchResultLocalStorage.splice(indexItemSearchResult, 1);
         setSearchResultLocalStorage((pre) => [...pre]);
-        if (
-          searchResultLocalStorage.length === 0 &&
-          searchResultServer.length === 0
-        ) {
-          setHasResult(false);
-        }
       }
       const indexItemDataHistory = dataHistory.findIndex((item) => {
         return item.id === idItemDeleteFromLocalStorage;
@@ -128,6 +120,54 @@ const Search = ({ className }) => {
     }
   };
 
+  const renderSearchResults = (attrs) => {
+    return (
+      <div className={cx('search-result')} tabIndex="-1" {...attrs}>
+        <Popper className={cx('search-result-popper')}>
+          {searchResultLocalStorage.length == 0 &&
+          searchResultServer.length === 0 ? (
+            <p className={cx('search-result-novalue')}>
+              Không tìm thấy kết quả cho "{debounceSearchValue.trim()}"
+            </p>
+          ) : (
+            <>
+              {searchResultServer.length > 0 && (
+                <div className={cx('search-popper-list')}>
+                  <p className={cx('search-fixed')}>Search Server</p>
+                  <div className={cx('search-body')}>
+                    {searchResultServer &&
+                      searchResultServer.map((result) => {
+                        return <SearchServer key={result.id} data={result} />;
+                      })}
+                  </div>
+                </div>
+              )}
+              {searchResultLocalStorage.length > 0 && (
+                <div className={cx('search-popper-list')}>
+                  <p className={cx('search-fixed')}>Search History</p>
+                  <div className={cx('search-body')}>
+                    {searchResultLocalStorage.map((data) => {
+                      return (
+                        <SearchHistory
+                          data={data}
+                          key={data.id}
+                          setShowModal={setShowModal}
+                          setIdItemDeleteFromLocalStorage={
+                            setIdItemDeleteFromLocalStorage
+                          }
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </Popper>
+      </div>
+    );
+  };
+
   return (
     <>
       <HeadlessTippy
@@ -136,57 +176,13 @@ const Search = ({ className }) => {
         offset={[0, 0]}
         visible={showResult && debounceSearchValue.length > 0}
         onClickOutside={() => {
-          setShowResult(false);
           if (showModal) {
             setShowResult(true);
+          } else {
+            setShowResult(false);
           }
         }}
-        render={(attrs) => (
-          <div className={cx('search-result')} tabIndex="-1" {...attrs}>
-            <Popper className={cx('search-result-popper')}>
-              {!hasResult ? (
-                <p className={cx('search-result-novalue')}>
-                  Không tìm thấy kết quả cho "{debounceSearchValue.trim()}"
-                </p>
-              ) : (
-                <>
-                  {searchResultServer.length > 0 && (
-                    <div className={cx('search-popper-list')}>
-                      <p className={cx('search-fixed')}>Search Server</p>
-                      <div className={cx('search-body')}>
-                        {searchResultServer &&
-                          searchResultServer.map((result, index) => {
-                            return (
-                              <SearchServer key={result.id} data={result} />
-                            );
-                          })}
-                      </div>
-                    </div>
-                  )}
-                  {searchResultLocalStorage.length > 0 && (
-                    <div className={cx('search-popper-list')}>
-                      <p className={cx('search-fixed')}>Search History</p>
-                      <div className={cx('search-body')}>
-                        {searchResultLocalStorage.map((data) => {
-                          return (
-                            <SearchHistory
-                              data={data}
-                              key={data.id}
-                              setShowModal={setShowModal}
-                              setIdItemDeleteFromLocalStorage={
-                                setIdItemDeleteFromLocalStorage
-                              }
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </Popper>
-          </div>
-        )}
+        render={(attrs) => renderSearchResults(attrs)}
       >
         <div className={cx('wrapper', className)}>
           {(showResult || searchValue.trim().length > 0) && (

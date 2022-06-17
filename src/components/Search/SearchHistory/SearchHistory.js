@@ -1,8 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames/bind';
+import PropTypes from 'prop-types';
+import { ClearIcon, SearchIcon } from '~/components/Icons';
 import styles from './SearchHistory.module.scss';
-import { SearchIcon, ClearIcon } from '~/components/Icons';
 
 const cx = classNames.bind(styles);
 const SearchHistory = ({
